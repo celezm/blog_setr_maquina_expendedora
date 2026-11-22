@@ -91,14 +91,21 @@ document.documentElement.classList.add('js');
   const now = () => performance.now();
 
   // StartupMode
-  const startup = { mark: 0, toggles: 0, on: false };
+  // setup() ya pinta CARGANDO...; loop() espera 500 ms antes de los destellos
+  const startup = { mark: 0, toggles: 0, on: false, started: false };
   function startupEnter(t) {
-    startup.mark = t; startup.toggles = 0; startup.on = true;
-    setLed1(true); setLed2(0);
+    startup.mark = t; startup.toggles = 0; startup.on = false; startup.started = false;
+    setLed1(false); setLed2(0);
     writeLine(0, 'CARGANDO...'); writeLine(1, '');
-    log('MODO ARRANQUE');
   }
   function startupUpdate(t) {
+    if (!startup.started) {
+      if (t - startup.mark < 500) return false;
+      startup.started = true; startup.mark = t; startup.on = true;
+      setLed1(true);
+      log('MODO ARRANQUE');
+      return false;
+    }
     if (t - startup.mark < 500) return false;
     startup.mark = t; startup.on = !startup.on; setLed1(startup.on);
     if (++startup.toggles < 6) return false;
@@ -130,7 +137,6 @@ document.documentElement.classList.add('js');
     if (svc.state === 'Waiting') {
       if (distanceCm > 0 && distanceCm < C.CUSTOMER_DISTANCE_CM) {
         svc.state = 'Monitoring'; svc.monStart = t; svc.lastDht = t - C.DHT_INTERVAL_MS;
-        writeLine(0, 'LEYENDO DHT11'); writeLine(1, '');
         log(`CLIENTE DETECTADO A ${distanceCm} cm`);
       }
     } else if (svc.state === 'Monitoring') {

@@ -1,5 +1,10 @@
 #include <avr/wdt.h>
-#include "Display.h"
+#include <Arduino.h>
+#include <LiquidCrystal.h>
+
+extern LiquidCrystal lcd;
+void WriteLine(byte row, const char *text);
+
 #include <ThreadController.h>
 #include "JoystickThread.h"
 #include "DhtThread.h"
@@ -8,7 +13,7 @@
 #include "ServiceMenu.h"
 #include "ProductCatalog.h"
 #include "StartupMode.h"
-#include "UltrasonicSensor.h"
+#include "UltrasonicThread.h"
 #include "ServiceMode.h"
 #include "AdminMode.h"
 
@@ -39,20 +44,23 @@ void WriteLine(byte row, const char *text) {
 
 ThreadController tasks;
 JoystickThread joystick;
-DhtThread dht_task;
+DhtThread dht_sensor;
 LedThread led1(StartupMode::Led1Pin);
 LedThread led2(ServiceMode::Led2Pin);
 StartupMode startup(led1);
 ProductCatalog catalog;
 ServiceMode service(catalog, led2);
 AdminMode admin(catalog);
-UltrasonicSensor ultra;
+UltrasonicThread ultrasonic_sensor;
 Mode mode = Mode::Startup;
 Button button;
 
 // Cambian su valor en interrupciones, volatile hace
 // que se revise su valor cada vez que se utiliza
 volatile bool btn_changed = false;
+const unsigned long StartupSettleMs = 500UL;
+unsigned long startup_wait_ms = 0;
+bool startup_started = false;
 
 void ExternalButtonIsr() {
   btn_changed = true;
@@ -63,7 +71,7 @@ void EnterService() {
   led1.Stop();
   joystick.TakeEvent(); // Descarta eventos anteriores al reinicio.
   service.Enter();
-  ultra.start();
+  ultrasonic_sensor.start();
 }
 
 void EnterAdmin() {
@@ -71,7 +79,7 @@ void EnterAdmin() {
   led1.SetLevel(255);
   led2.SetLevel(255);
   joystick.TakeEvent();
-  dht_task.enabled = false;
+  dht_sensor.enabled = false;
   admin.Enter();
   admin.Draw(millis());
   Serial.println(F("BOTON EXTERNO: ENTRAR ADMIN"));
@@ -90,27 +98,29 @@ void setup() {
                   ExternalButtonIsr, CHANGE);
 
   pinMode(JoystickThread::SwPin, INPUT_PULLUP);
-  pinMode(UltrasonicSensor::TrigPin, OUTPUT);
-  pinMode(UltrasonicSensor::EchoPin, INPUT);
+  pinMode(UltrasonicThread::TrigPin, OUTPUT);
+  pinMode(UltrasonicThread::EchoPin, INPUT);
 
-  digitalWrite(UltrasonicSensor::TrigPin, LOW);
+  digitalWrite(UltrasonicThread::TrigPin, LOW);
 
   lcd.begin(16, 2);
   dht.begin();
+  WriteLine(0, "CARGANDO...");
+  WriteLine(1, "");
 
   randomSeed(analogRead(A0));
 
   joystick.enabled = false;
-  dht_task.enabled = false;
-  ultra.enabled = false;
+  dht_sensor.enabled = false;
+  ultrasonic_sensor.enabled = false;
 
   tasks.add(&joystick);
-  tasks.add(&dht_task);
-  tasks.add(&ultra);
+  tasks.add(&dht_sensor);
+  tasks.add(&ultrasonic_sensor);
   tasks.add(&led1);
   tasks.add(&led2);
 
-  startup.Enter();
+  startup_wait_ms = millis();
 
   wdt_enable(WDTO_2S);
 }
@@ -118,6 +128,14 @@ void setup() {
 void loop() {
 
   wdt_reset();
+
+  if (mode == Mode::Startup && !startup_started) {
+    if ((unsigned long)(millis() - startup_wait_ms) >= StartupSettleMs) {
+      startup.Enter();
+      startup_started = true;
+    }
+    return;
+  }
 
   // Se revisa si se ha accionado el botón: 2-3s (rst) o 5s (admin)
   const ButtonAction action = button.Update(btn_changed);
@@ -139,24 +157,24 @@ void loop() {
 
   if (mode == Mode::Admin) {
     joystick.enabled = true;
-    dht_task.enabled = admin.ReadsTemperature();
-    ultra.enabled = admin.ReadsDistance();
+    dht_sensor.enabled = admin.ReadsTemperature();
+    ultrasonic_sensor.enabled = admin.ReadsDistance();
     tasks.run();
 
     const bool was_dist = admin.ReadsDistance();
     admin.Handle(joystick.TakeEvent());
     if (!was_dist && admin.ReadsDistance()) {
-      ultra.start();
+      ultrasonic_sensor.start();
     }
 
     float temp, hum;
-    if (dht_task.TakeReading(temp, hum)) {
+    if (dht_sensor.TakeReading(temp, hum)) {
       admin.ReceiveEnvironment(temp, hum);
     }
 
     if (admin.ReadsDistance()) {
       unsigned int dist_cm;
-      if (ultra.TakeMeasurement(dist_cm)) {
+      if (ultrasonic_sensor.TakeMeasurement(dist_cm)) {
         admin.ReceiveDistance(dist_cm);
       }
 
@@ -182,17 +200,17 @@ void loop() {
   const bool was_waiting = service.WaitingForCustomer();
   service.Update(millis());
   if (!was_waiting && service.WaitingForCustomer()) {
-    ultra.start();
+    ultrasonic_sensor.start();
   }
   joystick.enabled = service.InCatalog();
-  dht_task.enabled = service.Monitoring();
-  ultra.enabled = service.WaitingForCustomer();
+  dht_sensor.enabled = service.Monitoring();
+  ultrasonic_sensor.enabled = service.WaitingForCustomer();
   tasks.run();
 
   if (service.WaitingForCustomer()) {
     unsigned int dist_cm;
 
-    if (ultra.TakeMeasurement(dist_cm)) {
+    if (ultrasonic_sensor.TakeMeasurement(dist_cm)) {
       service.ReceiveDistance(dist_cm);
     }
 
@@ -200,7 +218,7 @@ void loop() {
   
   // Temperatura y humedad 5s
   float temp, hum;
-  if (dht_task.TakeReading(temp, hum)) {
+  if (dht_sensor.TakeReading(temp, hum)) {
     service.ReceiveEnvironment(temp, hum);
   }
 

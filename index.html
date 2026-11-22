@@ -22,6 +22,7 @@
         <li><a href="#modos">Modos</a></li>
         <li><a href="#video">Vídeo</a></li>
         <li><a href="#montaje">Montaje</a></li>
+        <li><a href="#interrupciones">Interrupciones</a></li>
         <li><a href="#tiempos">Tiempos</a></li>
         <li><a href="#codigo">Código</a></li>
         <li><a href="#conclusiones">Conclusiones</a></li>
@@ -32,20 +33,20 @@
 
 <main id="main">
 
-  <!-- Hero: Stage, the simulator is the visual -->
+  <!-- Portada con el simulador -->
   <section class="hero">
     <div class="container hero__grid">
       <div class="hero__text">
-        <h1>Cinco cafés en una pantalla de 16×2</h1>
-        <p class="lead">Controlador no bloqueante para Arduino UNO, con ultrasonidos, DHT11, joystick y watchdog.</p>
+        <h1>Práctica 3: Controlador de una Máquina Expendedora de café</h1>
+        <p class="lead">Una cafetera con Arduino UNO para Sistemas Empotrados y de Tiempo Real. Pruébala en el simulador.</p>
         <div class="actions">
-          <a class="btn btn--primary" href="descargas/p3_control_maquina_expendedora.zip" download>Descargar el sketch</a>
-          <a class="btn" href="#video">Ver la demostración</a>
+          <a class="btn btn--primary" href="descargas/p3_control_maquina_expendedora.zip" download>Descargar el código</a>
+          <a class="btn" href="#video">Verla funcionar</a>
         </div>
-        <p class="byline">Práctica 3 de Claudia Élez Mencía</p>
+        <p class="byline">Claudia Élez Mencía</p>
       </div>
 
-      <figure class="sim" data-slot="hero" data-kind="product" data-alt="Foto o vídeo de la máquina real con la LCD encendida y el joystick en primer plano" tabindex="0" aria-label="Simulador de la máquina: con el foco aquí, las flechas mueven el joystick y Enter pulsa SW">
+      <figure class="sim" data-slot="hero" tabindex="0" aria-label="Simulador de la máquina: con el foco aquí, las flechas mueven el joystick y Enter pulsa SW">
         <div class="lcd" aria-hidden="true">
           <div class="lcd__row" data-row="0"></div>
           <div class="lcd__row" data-row="1"></div>
@@ -85,12 +86,12 @@
     </div>
   </section>
 
-  <!-- Modes: switcher -->
+  <!-- Modos -->
   <section class="modes" id="modos">
     <div class="container">
       <div class="head-split">
-        <h2>Tres modos, doce pantallas</h2>
-        <p class="lead"><code>loop()</code> solo atiende al modo activo.</p>
+        <h2>Cómo se comporta la máquina</h2>
+        <p class="lead">Tiene tres modos y solo uno está activo cada vez. Cambia de pestaña para ver por qué pantallas pasa.</p>
       </div>
 
       <div class="switch" data-switch>
@@ -102,22 +103,22 @@
 
         <div role="tabpanel" id="p-arr" aria-labelledby="t-arr" class="panel">
           <table class="states">
-            <thead><tr><th scope="col">Estado</th><th scope="col">LCD</th><th scope="col">Pasa al siguiente</th></tr></thead>
+            <thead><tr><th scope="col">Estado</th><th scope="col">LCD</th><th scope="col">Cuándo avanza</th></tr></thead>
             <tbody>
-              <tr><th scope="row">Cargando</th><td><code>CARGANDO...</code></td><td>LED1 parpadea 3 veces y se apaga</td></tr>
+              <tr><th scope="row">Cargando</th><td><code>CARGANDO...</code></td><td>Tras 500 ms de espera, cuando LED1 ha parpadeado 3 veces</td></tr>
             </tbody>
           </table>
         </div>
 
         <div role="tabpanel" id="p-ser" aria-labelledby="t-ser" class="panel">
           <table class="states">
-            <thead><tr><th scope="col">Estado</th><th scope="col">LCD</th><th scope="col">Pasa al siguiente</th></tr></thead>
+            <thead><tr><th scope="col">Estado</th><th scope="col">LCD</th><th scope="col">Cuándo avanza</th></tr></thead>
             <tbody>
-              <tr><th scope="row">Espera</th><td><code>ESPERANDO CLIENTE</code></td><td>Cliente a menos de 100 cm</td></tr>
-              <tr><th scope="row">Entorno</th><td><code>Temp: / Hum:</code></td><td>5 s</td></tr>
-              <tr><th scope="row">Catálogo</th><td><code>Cafe Solo  1.00</code></td><td>SW elige la primera fila</td></tr>
-              <tr><th scope="row">Preparando</th><td><code>Preparando Cafe</code></td><td>4 a 8 s, LED2 sube por PWM</td></tr>
-              <tr><th scope="row">Retirar</th><td><code>RETIRE BEBIDA</code></td><td>3 s</td></tr>
+              <tr><th scope="row">Espera</th><td><code>ESPERANDO CLIENTE</code></td><td>Cuando alguien se acerca a menos de 100 cm</td></tr>
+              <tr><th scope="row">Entorno</th><td><code>Temp: / Hum:</code></td><td>A los 5 s</td></tr>
+              <tr><th scope="row">Catálogo</th><td><code>Cafe Solo  1.00</code></td><td>Al pulsar SW se pide el café de arriba</td></tr>
+              <tr><th scope="row">Preparando</th><td><code>Preparando Cafe</code></td><td>Entre 4 y 8 s, mientras LED2 se va encendiendo</td></tr>
+              <tr><th scope="row">Retirar</th><td><code>RETIRE BEBIDA</code></td><td>A los 3 s vuelve a esperar</td></tr>
             </tbody>
           </table>
         </div>
@@ -126,11 +127,11 @@
           <table class="states">
             <thead><tr><th scope="col">Estado</th><th scope="col">LCD</th><th scope="col">Qué hace</th></tr></thead>
             <tbody>
-              <tr><th scope="row">Menú</th><td><code>Ver temperatura</code></td><td>Izquierda siempre vuelve</td></tr>
-              <tr><th scope="row">Temperatura</th><td><code>Temp: / Hum:</code></td><td>DHT11 cada 2 s</td></tr>
-              <tr><th scope="row">Distancia</th><td><code>Distancia:</code></td><td>Cada 100 ms</td></tr>
-              <tr><th scope="row">Contador</th><td><code>Segundos:</code></td><td>Desde el encendido</td></tr>
-              <tr><th scope="row">Precios</th><td><code>+/-5 SW=OK</code></td><td>Pasos de 5 céntimos</td></tr>
+              <tr><th scope="row">Menú</th><td><code>Ver temperatura</code></td><td>Desde cualquier pantalla, izquierda vuelve aquí</td></tr>
+              <tr><th scope="row">Temperatura</th><td><code>Temp: / Hum:</code></td><td>Lee el DHT11 cada 2 s</td></tr>
+              <tr><th scope="row">Distancia</th><td><code>Distancia:</code></td><td>Mide cada 100 ms</td></tr>
+              <tr><th scope="row">Contador</th><td><code>Segundos:</code></td><td>Los que lleva encendida</td></tr>
+              <tr><th scope="row">Precios</th><td><code>+/-5 SW=OK</code></td><td>Sube o baja de 5 en 5 céntimos</td></tr>
             </tbody>
           </table>
         </div>
@@ -138,43 +139,47 @@
     </div>
   </section>
 
-  <!-- Demo video: free space -->
+  <!-- Vídeo de demostración -->
   <section class="demo" id="video">
     <div class="container">
       <div class="head-split">
-        <h2>La máquina, funcionando</h2>
-        <p class="lead">Arranque, un café y el modo Admin.</p>
+        <h2>Así funciona de verdad</h2>
+        <p class="lead">En el vídeo se ve el arranque, cómo se pide un café y el modo Admin.</p>
       </div>
       <!-- Para añadir el vídeo, sustituye el contenido de esta figure por uno de estos:
            <video controls preload="metadata" poster="img/poster.jpg"><source src="video/demo.mp4" type="video/mp4"></video>
            <iframe src="https://www.youtube-nocookie.com/embed/ID_DEL_VIDEO" title="Demostración de la máquina expendedora" allowfullscreen></iframe> -->
-      <figure class="video-slot" data-slot="video" data-alt="Vídeo de demostración de la máquina expendedora">
+      <figure class="video-slot" data-slot="video">
+        <video controls preload="metadata" playsinline poster="video/poster.jpg" aria-label="Demostración de la máquina expendedora, 2 min 56 s">
+          <source src="video/demo.mp4" type="video/mp4">
+        </video>
         <p class="slot-hint">Vídeo de demostración</p>
       </figure>
+      <p class="video-note">Para grabar la demo, el umbral del ultrasonidos se bajó de 1 m a 10 cm y así se ve mejor la espera del cliente.</p>
       <div class="photos__grid">
-        <figure class="photo photo--lead" data-slot="foto-1" data-alt="La máquina entera dentro de la carcasa, con la LCD encendida">
+        <figure class="photo photo--lead" data-slot="foto-1">
           <p class="slot-hint">Foto 1</p>
         </figure>
-        <figure class="photo" data-slot="foto-2" data-alt="Primer plano de la LCD mostrando el catálogo">
+        <figure class="photo" data-slot="foto-2">
           <p class="slot-hint">Foto 2</p>
         </figure>
-        <figure class="photo" data-slot="foto-3" data-alt="El LED2 encendido durante la preparación">
+        <figure class="photo" data-slot="foto-3">
           <p class="slot-hint">Foto 3</p>
         </figure>
       </div>
     </div>
   </section>
 
-  <!-- Wiring: showcase -->
+  <!-- Montaje -->
   <section class="wiring" id="montaje">
     <div class="container">
       <div class="head-split">
-        <h2>El montaje, cable a cable</h2>
-        <p class="lead">Planificado en Fritzing antes de cablear.</p>
+        <h2>El montaje</h2>
+        <p class="lead">Primero se dibujó en Fritzing y después se pasó a la protoboard.</p>
       </div>
       <figure class="diagram">
         <img src="img/pinout_maquina_expendedora.png" width="2831" height="1775" loading="lazy" alt="Esquema Fritzing: Arduino UNO, protoboard, LCD 1602 con potenciómetro y resistencia de retroiluminación, joystick, HC-SR04, DHT11, pulsador y dos LED con sus resistencias">
-        <figcaption>Joystick y pulsador con masas separadas.</figcaption>
+        <figcaption>El joystick y el pulsador llevan masas separadas.</figcaption>
       </figure>
       <div class="pins" id="pines">
         <h3>Qué va a cada pin</h3>
@@ -198,13 +203,84 @@
     </div>
   </section>
 
-  <!-- Button: figures -->
-  <section class="button-times" id="boton">
+  <!-- Interrupciones y antirrebote -->
+  <section class="button-times irq" id="interrupciones">
     <div class="container">
       <div class="head-split">
-        <h2>Un botón, tres duraciones</h2>
-        <p class="lead">La ISR anota el cambio; <code>loop()</code> mide la duración.</p>
+        <h2>Interrupciones y antirrebote</h2>
+        <p class="lead">Solo hay una interrupción, la del botón externo. La ISR casi no hace nada: levanta una bandera y el trabajo de verdad se hace en <code>loop()</code>.</p>
       </div>
+
+      <div class="explain">
+        <div class="explain__head">
+          <h3>El botón va a D2</h3>
+          <pre><code>volatile bool btn_changed = false;
+
+void ExternalButtonIsr() {
+  btn_changed = true;
+}
+
+<span class="c">// en setup()</span>
+pinMode(Button::Pin, INPUT_PULLUP);
+attachInterrupt(digitalPinToInterrupt(Button::Pin),
+                ExternalButtonIsr, CHANGE);</code></pre>
+        </div>
+        <dl class="explain__why">
+          <dt>¿Por qué D2?</dt>
+          <dd>En el UNO solo D2 (INT0) y D3 (INT1) tienen interrupción externa, y D3 ya está ocupado con el PWM de LED2.</dd>
+          <dt>¿Por qué <code>CHANGE</code>?</dt>
+          <dd>Así salta tanto al pulsar como al soltar. Hacen falta los dos flancos para saber cuánto tiempo se ha mantenido pulsado.</dd>
+          <dt>Una ISR lo más corta posible</dt>
+          <dd>Mientras se ejecuta, el resto del programa está parado, así que no imprime ni calcula nada. Solo pone la bandera a <code>true</code>.</dd>
+          <dt>¿Por qué <code>volatile</code>?</dt>
+          <dd>La variable cambia por fuera del flujo normal del programa. Con <code>volatile</code> el compilador la lee siempre de memoria y no se fía de una copia antigua.</dd>
+        </dl>
+      </div>
+
+      <div class="explain">
+        <div class="explain__head">
+          <h3>El antirrebote se hace en <code>loop()</code></h3>
+          <pre><code>if (pending) {
+  noInterrupts();
+  pending = false;
+  interrupts();
+  const bool reading = digitalRead(Pin) == LOW;
+  if (reading != raw_btn) {
+    raw_btn = reading;
+    change_ms = now;
+  }
+}
+if (raw_btn != stable_btn &&
+    (unsigned long)(now - change_ms) >= DebounceMs) {
+  stable_btn = raw_btn;
+  <span class="c">// pulsado: guarda press_ms</span>
+  <span class="c">// soltado: mide la duración</span>
+}</code></pre>
+        </div>
+        <dl class="explain__why">
+          <dt>La bandera se borra con las interrupciones paradas</dt>
+          <dd>El borrado va entre <code>noInterrupts()</code> e <code>interrupts()</code> para que la ISR no escriba justo a la vez. Si luego llega otro cambio, la bandera vuelve a subir y no se pierde.</dd>
+          <dt>Cada rebote reinicia la cuenta</dt>
+          <dd>Un pulsador nunca cambia limpio: el contacto vibra y da varios flancos seguidos. Cada uno actualiza <code>change_ms</code>, así que el cambio solo se acepta cuando el pin lleva 30 ms quieto.</dd>
+          <dt>Sin <code>delay()</code></dt>
+          <dd>La espera se mide con <code>millis()</code>, así que mientras tanto el joystick y los sensores siguen a lo suyo.</dd>
+          <dt>Lo que dure la pulsación decide qué pasa</dt>
+          <dd>Si se suelta entre los 2 y los 3 s, se reinicia el servicio. Si se llega a 5 s, entra o sale de Admin sin tener que soltarlo.</dd>
+        </dl>
+      </div>
+
+      <div class="table-wrap">
+      <h3>Cómo se filtra cada entrada</h3>
+      <table class="debounce-table">
+        <thead><tr><th scope="col">Entrada</th><th scope="col">Cómo se lee</th><th scope="col">Cómo se filtra</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Botón externo</th><td>Interrupción en D2</td><td>Tiene que pasar 30 ms sin cambios para darlo por bueno</td></tr>
+          <tr><th scope="row">SW del joystick</th><td>Sondeo cada 40 ms en D12</td><td>Lo mismo, 30 ms, y una pulsación cuenta una sola vez</td></tr>
+          <tr><th scope="row">Ejes del joystick</th><td>Sondeo cada 40 ms en A1 y A2</td><td>Por debajo de 350 o por encima de 674 es un movimiento. Hasta que la palanca no vuelve al centro (de 400 a 624) no cuenta otro</td></tr>
+        </tbody>
+      </table>
+      </div>
+
       <dl class="figures">
         <div><dt>Antirrebote</dt><dd class="figure">30 ms</dd></div>
         <div><dt>Reinicia el servicio</dt><dd class="figure">2 a 3 s</dd></div>
@@ -213,12 +289,12 @@
     </div>
   </section>
 
-  <!-- Timing: every read, write and wait, then the watchdog -->
+  <!-- Tiempos y watchdog -->
   <section class="timing" id="tiempos">
     <div class="container">
       <div class="head-split">
         <h2>Cada cuánto pasa cada cosa</h2>
-        <p class="lead">Todo se mide con <code>millis()</code> o <code>micros()</code>; ninguna espera detiene el <code>loop()</code>.</p>
+        <p class="lead">Aquí no hay ni un <code>delay()</code>: todas las esperas se miden con <code>millis()</code> o <code>micros()</code>, y el <code>loop()</code> nunca se queda parado.</p>
       </div>
       <div class="table-wrap">
       <table class="time-table">
@@ -234,22 +310,23 @@
           <tr class="time-table__group"><th scope="rowgroup" colspan="3">Actuadores</th></tr>
           <tr><th scope="row">LED1</th><td>20 ms; 3 destellos de 500 ms</td><td>Arranque y Admin</td></tr>
           <tr><th scope="row">LED2</th><td>20 ms; brillo según lo preparado</td><td>Preparando y Admin</td></tr>
-          <tr><th scope="row">LCD</th><td>Solo al cambiar algo</td><td>Siempre</td></tr>
+          <tr><th scope="row">LCD</th><td>Solo cuando hay algo nuevo que enseñar</td><td>Siempre</td></tr>
           <tr><th scope="row">Monitor serie</th><td>500 ms</td><td>Espera</td></tr>
         </tbody>
         <tbody>
-          <tr class="time-table__group"><th scope="rowgroup" colspan="3">Esperas del servicio, y a qué pasan</th></tr>
+          <tr class="time-table__group"><th scope="rowgroup" colspan="3">Lo que espera la máquina antes de avanzar</th></tr>
+          <tr><th scope="row">Arranque</th><td>500 ms con <code>CARGANDO...</code>, para que todo se estabilice</td><td>Destellos de LED1</td></tr>
           <tr><th scope="row">Cliente</th><td>A menos de 100 cm</td><td>Entorno</td></tr>
           <tr><th scope="row">Entorno</th><td>5 s</td><td>Catálogo</td></tr>
-          <tr><th scope="row">Preparando</th><td>4 a 8 s, nunca dos iguales seguidas</td><td>Retirar</td></tr>
+          <tr><th scope="row">Preparando</th><td>Entre 4 y 8 s, y nunca dos veces seguidas lo mismo</td><td>Retirar</td></tr>
           <tr><th scope="row">Retirar</th><td>3 s</td><td>Espera</td></tr>
         </tbody>
       </table>
       </div>
 
-      <div class="wdt">
-        <div class="wdt__head">
-          <h3>El watchdog</h3>
+      <div class="explain">
+        <div class="explain__head">
+          <h3>El watchdog, por si algo se cuelga</h3>
           <p class="figure figure--in">2 s</p>
           <pre><code>void setup() {
   MCUSR = 0;
@@ -263,45 +340,31 @@ void loop() {
   <span class="c">// ...</span>
 }</code></pre>
         </div>
-        <dl class="wdt__why">
-          <dt>Se apaga al arrancar</dt>
-          <dd>Tras un reinicio por watchdog sigue activo; sin esto, la placa se reiniciaría en bucle durante <code>setup()</code>.</dd>
+        <dl class="explain__why">
+          <dt>Se apaga nada más arrancar</dt>
+          <dd>Después de un reinicio por watchdog sigue activo. Si no se apaga lo primero, la placa podría reiniciarse en bucle antes de acabar <code>setup()</code>.</dd>
           <dt>Se enciende al final de <code>setup()</code></dt>
-          <dd>Solo vigila el funcionamiento normal.</dd>
-          <dt>Se alimenta en <code>loop()</code></dt>
-          <dd>Si una tarea se cuelga, nadie llama a <code>wdt_reset()</code> y la placa se reinicia.</dd>
-          <dt>Por qué 2 s</dt>
-          <dd>Una vuelta dura milisegundos: hay margen de sobra sin tardar en recuperar la máquina.</dd>
+          <dd>Así solo vigila cuando la máquina ya está funcionando con normalidad.</dd>
+          <dt>Se alimenta en cada vuelta de <code>loop()</code></dt>
+          <dd>Si alguna tarea se queda colgada, nadie llama a <code>wdt_reset()</code> y la placa se reinicia sola.</dd>
+          <dt>¿Por qué 2 s?</dt>
+          <dd>Una vuelta de <code>loop()</code> dura milisegundos, así que sobra margen, y si algo falla la máquina vuelve enseguida.</dd>
         </dl>
       </div>
     </div>
   </section>
 
-  <!-- Requirements: rows with state tags -->
-  <section class="reqs" id="requisitos">
-    <div class="container reqs__grid">
-      <h2>Lo que pide el enunciado</h2>
-      <ul class="ruled">
-        <li><h3>Interrupciones</h3><p><code>attachInterrupt</code> en D2.</p><span class="tag tag--in">Hecho</span></li>
-        <li><h3>Sin <code>delay()</code></h3><p><code>millis()</code> y <code>micros()</code>, sin <code>pulseIn()</code>.</p><span class="tag tag--in">Hecho</span></li>
-        <li><h3>Watchdog</h3><p><code>WDTO_2S</code> en cada vuelta.</p><span class="tag tag--in">Hecho</span></li>
-        <li><h3>ArduinoThread</h3><p>Tareas cooperativas para joystick, sensores y LED.</p><span class="tag tag--in">Hecho</span></li>
-        <li><h3>LedThread</h3><p>Parpadeo de LED1 y brillo proporcional de LED2.</p><span class="tag tag--in">Hecho</span></li>
-      </ul>
-    </div>
-  </section>
-
-  <!-- Code structure: grouped index, then the loop -->
+  <!-- Estructura del código -->
   <section class="code" id="codigo">
     <div class="container">
       <div class="head-split">
-        <h2>Estructura del código</h2>
-        <p class="lead">Un <code>.ino</code> que coordina y una cabecera por clase.</p>
+        <h2>Cómo está organizado el código</h2>
+        <p class="lead">El <code>.ino</code> lo coordina todo y cada clase tiene su propia cabecera.</p>
       </div>
       <div class="tree">
         <div class="tree__main">
           <p class="tree__file">p3_control_maquina_expendedora.ino</p>
-          <p>Objetos compartidos, <code>setup()</code> y el cambio de modo.</p>
+          <p>Aquí están los objetos compartidos, <code>setup()</code> y el cambio de modo.</p>
         </div>
         <section class="tree__group" aria-labelledby="g-modos">
           <h3 id="g-modos">Modos</h3>
@@ -317,7 +380,7 @@ void loop() {
           <dl>
             <dt>JoystickThread.h</dt><dd>Eventos</dd>
             <dt>DhtThread.h</dt><dd>Temperatura y humedad</dd>
-            <dt>UltrasonicSensor.h</dt><dd>Distancia</dd>
+            <dt>UltrasonicThread.h</dt><dd>Distancia</dd>
             <dt>LedThread.h</dt><dd>Destellos y brillo de los LED</dd>
           </dl>
         </section>
@@ -331,8 +394,7 @@ void loop() {
         <section class="tree__group" aria-labelledby="g-config">
           <h3 id="g-config">Configuración</h3>
           <dl>
-            <dt>p3_control_maquina_expendedora.ino</dt><dd>Pines de la LCD y del DHT11, tipo <code>Mode</code></dd>
-            <dt>Display.h</dt><dd>Declara la LCD y <code>WriteLine()</code></dd>
+            <dt>p3_control_maquina_expendedora.ino</dt><dd>Pines de la LCD y del DHT11, la LCD con <code>WriteLine()</code> y el tipo <code>Mode</code></dd>
           </dl>
         </section>
       </div>
@@ -346,51 +408,53 @@ void loop() {
   <span class="c">// ... Admin y Arranque salen antes</span>
   service.Update(millis());
   joystick.enabled = service.InCatalog();
-  dht_task.enabled = service.Monitoring();
-  ultra.enabled = service.WaitingForCustomer();
+  dht_sensor.enabled = service.Monitoring();
+  ultrasonic_sensor.enabled = service.WaitingForCustomer();
   tasks.run();
   <span class="c">// ... recoge medidas y eventos</span>
 }</code></pre>
           <figcaption>p3_control_maquina_expendedora.ino</figcaption>
         </figure>
         <div class="tile"><p class="figure">40 ms</p><h4>JoystickThread</h4><p>Un evento por movimiento.</p></div>
-        <div class="tile"><p class="figure">2 s</p><h4>DhtThread</h4><p>Solo cuando se muestra.</p></div>
-        <div class="tile"><p class="figure">10 µs</p><h4>UltrasonicSensor</h4><p>Pulso TRIG sin bloquear.</p></div>
-        <div class="tile"><p class="figure">5</p><h4>ProductCatalog</h4><p>Productos, precios en céntimos.</p></div>
+        <div class="tile"><p class="figure">2 s</p><h4>DhtThread</h4><p>Solo lee cuando hay que enseñarlo.</p></div>
+        <div class="tile"><p class="figure">10 µs</p><h4>UltrasonicThread</h4><p>Lanza el pulso TRIG sin bloquear.</p></div>
+        <div class="tile"><p class="figure">5</p><h4>ProductCatalog</h4><p>Productos, con los precios en céntimos.</p></div>
       </div>
     </div>
   </section>
 
-  <!-- Conclusions: rows -->
+  <!-- Conclusiones y desafíos -->
   <section class="concl" id="conclusiones">
     <div class="container concl__grid">
       <h2>Conclusiones</h2>
       <ol class="concl__list">
-        <li><h3>Nada espera a nada</h3><p>Con máquinas de estados, el joystick responde mientras se mide la distancia.</p></li>
-        <li><h3>La ISR, mínima</h3><p>Solo anota el cambio; la duración se mide en <code>loop()</code>.</p></li>
-        <li><h3>Probar por piezas</h3><p>Cada componente tuvo su prueba en <code>prototipos/</code> antes de integrarlo.</p></li>
-        <li><h3>El montaje también cuenta</h3><p>El joystick quedó girado: A1 es el eje vertical.</p></li>
+        <li><h3>Nada espera a nada</h3><p>Gracias a las máquinas de estados, el joystick responde aunque en ese momento se esté midiendo la distancia.</p></li>
+        <li><h3>La ISR, cuanto más corta mejor</h3><p>Solo apunta que algo ha cambiado; cuánto duró la pulsación se calcula en <code>loop()</code>.</p></li>
+        <li><h3>Probar por piezas</h3><p>Antes de juntar nada, cada componente tuvo su propia prueba en <code>prototipos/</code>. Así los fallos aparecían de uno en uno.</p></li>
+        <li><h3>El montaje también cuenta</h3><p>El joystick acabó girado en la protoboard, así que A1 es el eje vertical y no el horizontal.</p></li>
       </ol>
-      <h2 class="concl__second">Desafíos</h2>
+      <h2 class="concl__second">Lo que más me costó</h2>
       <ol class="concl__list">
-        <li><h3>Una LCD que no se leía</h3><p>Salían caracteres extraños; las pruebas <code>prueba_lcd</code> y <code>prueba_lcd_potenciometro</code> separaron cableado y contraste.</p></li>
-        <li><h3>Ejes cambiados</h3><p>Hubo que medir el valor crudo de A1 para saber qué era arriba.</p></li>
-        <li><h3>LED1 necesitaba PWM</h3><p><code>LedThread</code> usa <code>analogWrite()</code>, y D13 no tiene PWM en el UNO: LED1 pasó a D11.</p></li>
-        <li><h3>Del monolito a las clases</h3><p>El primer sketch hacía todo en un archivo; partirlo en una cabecera por tarea permitió probarlo por partes.</p></li>
+        <li><h3>Una LCD que no se leía</h3><p>Al principio solo salían caracteres raros. Con <code>prueba_lcd</code> y <code>prueba_lcd_potenciometro</code> pude saber si era culpa del cableado o del contraste.</p></li>
+        <li><h3>Ejes cambiados</h3><p>Tuve que sacar por el monitor serie el valor crudo de A1 para averiguar hacia dónde era arriba.</p></li>
+        <li><h3>LED1 necesitaba PWM</h3><p><code>LedThread</code> usa <code>analogWrite()</code>, pero en el UNO el D13 no tiene PWM, así que moví LED1 al D11.</p></li>
+        <li><h3>Del monolito a las clases</h3><p>El primer sketch lo hacía todo en un único archivo. Partirlo en una cabecera por tarea me dejó probar cada parte por separado.</p></li>
       </ol>
     </div>
   </section>
 
-  <!-- Close: download band -->
+  <!-- Archivos -->
   <section class="files" id="archivos">
     <div class="container files__grid">
       <div>
-        <h2>El proyecto, en archivos</h2>
-        <p class="lead">Carcasa de dos piezas en FreeCAD, con salida USB lateral.</p>
+        <h2>Archivos del proyecto</h2>
+        <p class="lead">Todo lo necesario para montarla. La carcasa son dos piezas diseñadas en FreeCAD, con un hueco lateral para el USB.</p>
       </div>
       <ul class="files__list">
-        <li><a href="descargas/p3_control_maquina_expendedora.zip" download>p3_control_maquina_expendedora.zip</a><span>Sketch completo, 12 KB</span></li>
-        <li><a href="descargas/p3_control_maquina_expendedora.ino" download>p3_control_maquina_expendedora.ino</a><span>Solo el sketch principal</span></li>
+        <!-- Enlace al repositorio: cambia el href si la dirección es otra -->
+        <li><a href="https://github.com/celezm/p3_control_maquina_expendedora">Repositorio en GitHub</a><span>Código fuente, historial y README</span></li>
+        <li><a href="descargas/p3_control_maquina_expendedora.zip" download>p3_control_maquina_expendedora.zip</a><span>Todo el proyecto, con las cabeceras</span></li>
+        <li><a href="descargas/p3_control_maquina_expendedora.ino" download>p3_control_maquina_expendedora.ino</a><span>Solo el .ino principal</span></li>
         <li><a href="descargas/pinout_maquina_expendedora.fzz" download>pinout_maquina_expendedora.fzz</a><span>Esquema Fritzing</span></li>
         <li><a href="descargas/base.stl" download>base.stl</a><span>Base, 128 KB</span></li>
         <li><a href="descargas/tapa.stl" download>tapa.stl</a><span>Tapa, 17 KB</span></li>
@@ -403,17 +467,18 @@ void loop() {
 <footer class="footer">
   <div class="container footer__grid">
     <div class="footer__about">
-      <p class="wordmark">Expendedora P3</p>
+      <p class="wordmark">P3 Máquina Expendedora</p>
       <p>Sistemas Empotrados y de Tiempo Real<br>Grado en Ingeniería en Robótica Software, URJC</p>
       <p>Claudia Élez Mencía</p>
     </div>
     <nav aria-label="Pie: secciones">
-      <h2 class="footer__h">Esta página</h2>
+      <h2 class="footer__h">En esta página</h2>
       <ul>
         <li><a href="#modos">Modos</a></li>
         <li><a href="#video">Demostración</a></li>
         <li><a href="#montaje">Montaje</a></li>
         <li><a href="#pines">Pines</a></li>
+        <li><a href="#interrupciones">Interrupciones y antirrebote</a></li>
         <li><a href="#codigo">Estructura del código</a></li>
         <li><a href="#conclusiones">Conclusiones</a></li>
       </ul>
@@ -421,6 +486,8 @@ void loop() {
     <nav aria-label="Pie: referencias">
       <h2 class="footer__h">Referencias</h2>
       <ul>
+        <!-- Enlace al repositorio: cambia el href si la dirección es otra -->
+        <li><a href="https://github.com/celezm/p3_control_maquina_expendedora">Repositorio en GitHub</a></li>
         <li><a href="https://www.arduino.cc/reference/en/">Referencia de Arduino</a></li>
         <li><a href="https://www.arduino.cc/en/Reference/LiquidCrystal">LiquidCrystal</a></li>
         <li><a href="https://www.arduino.cc/reference/en/libraries/arduinothread/">ArduinoThread</a></li>
@@ -431,7 +498,6 @@ void loop() {
 </footer>
 
 <script src="maquina.js"></script>
-<script>window.hallmarkSlots = (m) => { for (const [k, v] of Object.entries(m)) { const s = document.querySelector(`[data-slot="${k}"]`); if (!s) continue; const im = new Image(); im.src = typeof v === 'string' ? v : v.src; im.alt = (typeof v === 'object' && v.alt) || s.dataset.alt || ''; s.querySelectorAll(':scope > img').forEach((o) => o.remove()); s.prepend(im); } };
-document.querySelectorAll('[data-slot] img').forEach((i) => { if (i.complete && !i.naturalWidth) i.remove(); else i.addEventListener('error', () => i.remove(), { once: true }); });</script>
+<script>document.querySelectorAll('[data-slot] img').forEach((i) => { if (i.complete && !i.naturalWidth) i.remove(); else i.addEventListener('error', () => i.remove(), { once: true }); });</script>
 </body>
 </html>
