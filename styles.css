@@ -138,8 +138,8 @@ tbody th { font-weight: 600; font-size: var(--text-lg); white-space: nowrap; }
 
 /* interrupciones y antirrebote */
 .irq .explain { margin-top: var(--space-2xl); }
-.irq .table-wrap { margin-top: var(--space-3xl); }
 .irq h3 { margin-bottom: var(--space-md); }
+.irq__code { max-width: 42rem; margin-bottom: var(--space-3xl); }
 .debounce-table tbody th { width: 18%; }
 .debounce-table td:nth-child(2) { width: 30%; }
 .debounce-table td:last-child { color: var(--color-ink-2); }
@@ -169,7 +169,7 @@ tbody th { font-weight: 600; font-size: var(--text-lg); white-space: nowrap; }
 /* fragmento de loop() */
 .code { padding-block: var(--section-gap-l) var(--section-gap); }
 /* estructura del código */
-.tree { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-xl) var(--gap-columns); }
+.tree { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-xl) var(--gap-columns); }
 .tree__main { grid-column: 1 / -1; display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: var(--gap-columns); align-items: baseline; padding: var(--space-lg) 0; border-block: var(--rule-hair) solid var(--color-ink); }
 .tree__file { margin: 0; font: 400 var(--text-xl)/1.2 var(--font-outlier); overflow-wrap: anywhere; }
 .tree__main p:last-child { color: var(--color-ink-2); }
@@ -257,9 +257,10 @@ tbody th { font-weight: 600; font-size: var(--text-lg); white-space: nowrap; }
 
 /* fotos */
 .photos__grid { margin-top: var(--gap-columns); }
-.photos__grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(0, 1fr)); gap: var(--gap-columns); }
-.photo { margin: 0; min-height: 240px; border-radius: var(--radius-card); border: var(--rule-hair) dashed var(--color-muted); grid-column: 9 / span 4; }
-.photo--lead { grid-column: 1 / span 8; grid-row: 1 / span 2; aspect-ratio: 4 / 3; }
+.photos__grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); grid-template-rows: repeat(3, minmax(0, 1fr)); gap: var(--gap-columns); }
+.photo { margin: 0; min-height: 160px; border-radius: var(--radius-card); border: var(--rule-hair) dashed var(--color-muted); grid-column: 9 / span 4; }
+.photo--lead { grid-column: 1 / span 8; grid-row: 1 / span 3; aspect-ratio: 4 / 3; }
+.photo:has(> img) { border-style: solid; }
 
 /* móvil y tableta */
 @media (max-width: 60rem) {
