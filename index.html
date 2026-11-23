@@ -24,6 +24,7 @@
         <li><a href="#codigo">Código</a></li>
         <li><a href="#tiempos">Tiempos</a></li>
         <li><a href="#interrupciones">Interrupciones</a></li>
+        <li><a href="#watchdog">Watchdog</a></li>
         <li><a href="#librerias">Librerías</a></li>
         <li><a href="#video">Vídeo</a></li>
       </ul>
@@ -245,7 +246,7 @@
         </tbody>
       </table>
       </div>
-
+    </div>
   </section>
 
   <!-- Interrupciones y avisos entre tareas -->
@@ -279,6 +280,39 @@ attachInterrupt(digitalPinToInterrupt(Button::Pin),
         </tbody>
       </table>
       <p class="video-note">Estos avisos se procesan en el loop en función del modo en el que se encuentre el sistema. <code>ThreadController</code> también es cooperativo y revisa las tareas desde <code>loop()</code>.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Watchdog -->
+  <section class="timing" id="watchdog">
+    <div class="container">
+      <div class="head-split">
+        <h2>Watchdog</h2>
+        <p class="lead">Si el programa se queda colgado, el watchdog reinicia la placa sola a los 2 s.</p>
+      </div>
+      <div class="explain">
+        <div class="explain__head">
+          <pre><code>void setup() {
+  MCUSR = 0;
+  wdt_disable();
+  <span class="c">// ... pines, LCD, tareas</span>
+  wdt_enable(WDTO_2S);
+}
+
+void loop() {
+  wdt_reset();
+  <span class="c">// ...</span>
+}</code></pre>
+        </div>
+        <dl class="explain__why">
+          <dt>Se desactiva al arrancar</dt>
+          <dd>Después de un reinicio por watchdog sigue activo. Si no se desactiva lo primero, la placa podría reiniciarse en bucle antes de acabar <code>setup()</code>.</dd>
+          <dt>Se enciende al final de <code>setup()</code></dt>
+          <dd>Así solo vigila cuando la máquina ya está funcionando.</dd>
+          <dt>Se reinicia en cada vuelta de <code>loop()</code></dt>
+          <dd>Si una tarea se queda colgada, nadie llama a <code>wdt_reset()</code> y a los 2 s la placa se reinicia.</dd>
+        </dl>
       </div>
     </div>
   </section>
@@ -366,6 +400,7 @@ attachInterrupt(digitalPinToInterrupt(Button::Pin),
         <li><a href="#codigo">Estructura del código</a></li>
         <li><a href="#tiempos">Tiempos</a></li>
         <li><a href="#interrupciones">Interrupciones y avisos</a></li>
+        <li><a href="#watchdog">Watchdog</a></li>
         <li><a href="#librerias">Librerías</a></li>
         <li><a href="#archivos">Archivos</a></li>
         <li><a href="#video">Demostración</a></li>
